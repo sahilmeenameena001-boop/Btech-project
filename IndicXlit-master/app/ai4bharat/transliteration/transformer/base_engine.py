@@ -6,7 +6,26 @@ from pydload import dload
 import zipfile
 from abc import ABC, abstractmethod, abstractproperty
 from indicnlp.normalize.indic_normalize import IndicNormalizerFactory
-from urduhack import normalize as shahmukhi_normalize
+
+def _load_shahmukhi_normalize():
+    """
+    urduhack's package __init__ imports its NLP pipeline, which needs TensorFlow (and pins
+    Click 7, which conflicts with Flask 2+). We only use its regex-based normaliser, so
+    register a bare `urduhack` package and import just that submodule.
+    Works with `pip install --no-deps urduhack regex`.
+    """
+    import importlib.util, sys, types
+    if "urduhack" not in sys.modules:
+        spec = importlib.util.find_spec("urduhack")
+        if spec is None:
+            raise ImportError("urduhack is not installed: pip install --no-deps urduhack regex")
+        pkg = types.ModuleType("urduhack")
+        pkg.__path__ = list(spec.submodule_search_locations)
+        sys.modules["urduhack"] = pkg
+    from urduhack.normalization import normalize
+    return normalize
+
+shahmukhi_normalize = _load_shahmukhi_normalize()
 
 from ..utils import *
 LANG_WORD_REGEXES = {
