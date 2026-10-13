@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #12110f;
+  --color-ink-2: #1a1916;
+  --color-rule: #2c2925;
+  --color-paper: #efe8dc;
+  --color-muted: #948b7e;
+  --color-accent: #e8613c;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-instrument), "Times New Roman", serif;
+  /* Indic text: rely on the OS script fonts (Nirmala UI on Windows, Noto on Android/Linux,
+     Kohinoor/ITF on macOS), with web fonts for Nastaliq and Meetei Mayek. */
+  --font-indic: "Nirmala UI", "Noto Sans", "Kohinoor Devanagari", var(--font-meetei), var(--font-nastaliq), system-ui, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: auto;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+/* Perso-Arabic scripts read better in Nastaliq */
+[lang="ur"], [lang="ks"] {
+  font-family: var(--font-nastaliq), var(--font-indic);
+  line-height: 1.9;
+}
+[lang="sd"] {
+  font-family: var(--font-indic);
+}
+[lang="mni"] {
+  font-family: var(--font-meetei), var(--font-indic);
+}
+
+/* Filmic grain — kept under 5% */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Masked line reveal: the inner span is translated by GSAP */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.line-mask > span {
+  display: block;
+}
+
+/* Underline that wipes in from the left */
+.wipe-link {
+  background: linear-gradient(currentColor, currentColor) no-repeat 100% 100% / 0 1px;
+  transition: background-size 350ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+.wipe-link:hover,
+.wipe-link:focus-visible {
+  background-position: 0 100%;
+  background-size: 100% 1px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Hide content that GSAP reveals, only when JS + motion are on (set on <html> by SmoothScroll) */
+html.motion-ok .reveal-up {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

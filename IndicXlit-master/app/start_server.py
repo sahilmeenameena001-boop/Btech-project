@@ -1,7 +1,8 @@
+import os
 from ai4bharat.transliteration import xlit_server
 
 DEBUG = False
-PORT = 8888
+PORT = int(os.environ.get("PORT", 8888))  # hosting platforms inject PORT
 
 app, engine = xlit_server.get_app()
 
@@ -12,7 +13,7 @@ else:
     from gevent.pywsgi import WSGIServer
 
     cors = CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
-    http_server = WSGIServer((PORT), app)
+    http_server = WSGIServer(("0.0.0.0", PORT), app)
 
     print("Starting production server...")
     http_server.serve_forever()
